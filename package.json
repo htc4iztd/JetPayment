@@ -8,6 +8,9 @@
     "build": "tsc",
     "dev": "ts-node src/index.ts",
     "test": "jest --config jest.config.js",
+    "test:agents": "jest --config jest.config.js tests/agents.test.ts",
+    "sim": "ts-node agents/scenarios/run-all.ts",
+    "sim:scenario": "ts-node agents/scenarios/run-all.ts",
     "lint": "eslint src/ --ext .ts",
     "start": "node dist/index.js"
   },
