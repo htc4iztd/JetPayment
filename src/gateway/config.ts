@@ -19,18 +19,24 @@ export const DEFAULT_POLICY: GatewayPolicy = {
 
 /**
  * Create a JetPaymentConfig with sensible defaults.
+ *
+ * If `discoveryProvider` is supplied, it takes precedence.
+ * Otherwise, falls back to `moltbook` config for backward compatibility.
  */
 export function createDefaultConfig(
   overrides: Partial<JetPaymentConfig> = {}
 ): JetPaymentConfig {
   return {
-    moltbook: {
-      apiBaseUrl: 'https://moltbook.example.com',
-      agentHandle: '',
-      apiToken: '',
-      pollIntervalMs: 5000,
-      ...overrides.moltbook,
-    },
+    discoveryProvider: overrides.discoveryProvider,
+    moltbook: overrides.discoveryProvider
+      ? undefined
+      : {
+          apiBaseUrl: 'https://moltbook.example.com',
+          agentHandle: '',
+          apiToken: '',
+          pollIntervalMs: 5000,
+          ...overrides.moltbook,
+        },
     p2p: {
       listenAddr: '/ip4/0.0.0.0/tcp/0',
       connectionTimeoutMs: 30000,

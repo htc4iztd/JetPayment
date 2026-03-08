@@ -7,7 +7,8 @@
 
 import { EventEmitter } from 'events';
 import { Keypair, PublicKey } from '@solana/web3.js';
-import { DiscoveryService, type MoltbookConfig } from '../discovery';
+import { MoltbookDiscoveryProvider, type MoltbookConfig } from '../discovery';
+import type { IDiscoveryService } from '../types';
 import { P2PService, type P2PConfig } from '../p2p';
 import { NegotiationEngine } from '../negotiation/engine';
 import { MessageBuilder } from '../negotiation/message-builder';
@@ -27,7 +28,10 @@ import {
 } from '../types';
 
 export interface JetPaymentConfig {
-  moltbook: MoltbookConfig;
+  /** Discovery provider instance. If not provided, falls back to moltbook config. */
+  discoveryProvider?: IDiscoveryService;
+  /** @deprecated Use discoveryProvider instead. Kept for backward compatibility. */
+  moltbook?: MoltbookConfig;
   p2p: P2PConfig;
   settlement: SettlementConfig;
   policy: GatewayPolicy;
@@ -45,7 +49,7 @@ export interface JetPaymentConfig {
  * the AI's decisions and actual blockchain execution.
  */
 export class JetPaymentGateway extends EventEmitter {
-  private discovery: DiscoveryService;
+  private discovery: IDiscoveryService;
   private p2p: P2PService;
   private negotiation: NegotiationEngine;
   private settlement: SettlementService;
@@ -66,11 +70,19 @@ export class JetPaymentGateway extends EventEmitter {
     const secretBytes = walletKeypair.secretKey;
 
     // Initialize sub-services
-    this.discovery = new DiscoveryService(
-      config.moltbook,
-      walletKeypair.publicKey.toBytes(),
-      secretBytes.slice(0, 32)
-    );
+    if (config.discoveryProvider) {
+      this.discovery = config.discoveryProvider;
+    } else if (config.moltbook) {
+      this.discovery = new MoltbookDiscoveryProvider(
+        config.moltbook,
+        walletKeypair.publicKey.toBytes(),
+        secretBytes.slice(0, 32)
+      );
+    } else {
+      throw new Error(
+        'JetPaymentConfig requires either discoveryProvider or moltbook config'
+      );
+    }
 
     this.p2p = new P2PService(
       config.p2p,

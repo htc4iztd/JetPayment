@@ -17,7 +17,7 @@ import {
   type NegotiationDecision,
 } from '../base';
 import type { MoltbookConfig } from '../../src/discovery';
-import type { OfferContent, NegotiationMessage } from '../../src/types';
+import type { IDiscoveryService, OfferContent, NegotiationMessage } from '../../src/types';
 
 export class SellerAgent extends BaseAgent {
   /** Track our latest asking price per conversation */
@@ -32,7 +32,7 @@ export class SellerAgent extends BaseAgent {
     floorPrice: number,
     initialAsk: number,
     aggressiveness: number = 0.5,
-    moltbookConfig?: MoltbookConfig
+    discoveryOrConfig?: IDiscoveryService | MoltbookConfig
   ) {
     const profile: AgentProfile = {
       name,
@@ -46,7 +46,7 @@ export class SellerAgent extends BaseAgent {
 
     super(
       profile,
-      moltbookConfig || {
+      discoveryOrConfig || {
         apiBaseUrl: 'http://localhost:3000',
         agentHandle: name.toLowerCase().replace(/\s+/g, '-'),
         apiToken: 'test-token',

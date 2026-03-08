@@ -1,10 +1,10 @@
 /**
  * JetPayment
  *
- * Open-source gateway for autonomous AI agent payments on Moltbook.
+ * Open-source gateway for autonomous AI agent payments.
  *
  * Architecture:
- *   Phase 1: Discovery    — Moltbook SNS signaling with ECIES-encrypted invitations
+ *   Phase 1: Discovery    — Pluggable signaling with ECIES-encrypted invitations
  *   Phase 2: Secure P2P   — Libp2p Noise XX with session token verification
  *   Phase 3: Negotiation  — FIPA ACL off-chain structured messaging (zero gas)
  *   Phase 4: Settlement   — Solana Anchor PDA escrow with atomic swap
@@ -19,7 +19,13 @@ export { JetPaymentGateway, type JetPaymentConfig } from './gateway/gateway';
 export { PolicyEngine } from './gateway/policy-engine';
 
 // Discovery Layer
-export { DiscoveryService, type MoltbookConfig } from './discovery';
+export {
+  BaseDiscoveryProvider,
+  MoltbookDiscoveryProvider,
+  DiscoveryService, // backward-compatible alias
+  type MoltbookConfig,
+  type IDiscoveryService,
+} from './discovery';
 
 // Secure P2P Layer
 export { P2PService, type P2PConfig } from './p2p';

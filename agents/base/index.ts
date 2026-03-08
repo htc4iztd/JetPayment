@@ -15,7 +15,8 @@ import { EventEmitter } from 'events';
 import { ed25519 } from '@noble/curves/ed25519';
 import { NegotiationEngine } from '../../src/negotiation/engine';
 import { PolicyEngine } from '../../src/gateway/policy-engine';
-import { DiscoveryService, type MoltbookConfig } from '../../src/discovery';
+import { MoltbookDiscoveryProvider, type MoltbookConfig } from '../../src/discovery';
+import type { IDiscoveryService } from '../../src/types';
 import { bytesToHex } from '../../src/crypto';
 import type {
   OfferContent,
@@ -123,7 +124,7 @@ export abstract class BaseAgent extends EventEmitter {
 
   protected negotiation: NegotiationEngine;
   protected policyEngine: PolicyEngine;
-  protected discovery: DiscoveryService;
+  protected discovery: IDiscoveryService;
   protected logger: AgentLogger;
   protected portfolio: AgentAsset[] = [];
   protected completedDeals: Array<{
@@ -135,7 +136,7 @@ export abstract class BaseAgent extends EventEmitter {
 
   private counterOfferCounts: Map<string, number> = new Map();
 
-  constructor(profile: AgentProfile, moltbookConfig: MoltbookConfig) {
+  constructor(profile: AgentProfile, discoveryOrConfig: IDiscoveryService | MoltbookConfig) {
     super();
     this.profile = profile;
 
@@ -164,11 +165,18 @@ export abstract class BaseAgent extends EventEmitter {
       policy
     );
 
-    this.discovery = new DiscoveryService(
-      moltbookConfig,
-      this.publicKey,
-      this.secretKey
-    );
+    // Accept either a pre-built IDiscoveryService or a MoltbookConfig
+    if ('createInvitation' in discoveryOrConfig) {
+      // Already an IDiscoveryService instance
+      this.discovery = discoveryOrConfig as IDiscoveryService;
+    } else {
+      // Legacy: MoltbookConfig — instantiate MoltbookDiscoveryProvider
+      this.discovery = new MoltbookDiscoveryProvider(
+        discoveryOrConfig as MoltbookConfig,
+        this.publicKey,
+        this.secretKey
+      );
+    }
 
     this.wireNegotiationEvents();
   }

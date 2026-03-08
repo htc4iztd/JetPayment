@@ -7,6 +7,61 @@
 // Phase 1: Discovery Types
 // ============================================================
 
+// ============================================================
+// Discovery Provider Interface (transport-agnostic)
+// ============================================================
+
+/**
+ * Generic discovery service interface.
+ *
+ * Any signaling backend (Moltbook, Webhook, DHT, direct connection, etc.)
+ * can implement this interface to serve as a discovery provider for
+ * JetPayment's Phase 1.
+ */
+export interface IDiscoveryService {
+  /** Create an encrypted invitation for a target agent. */
+  createInvitation(
+    targetSolanaPubkey: Uint8Array,
+    multiaddr: string
+  ): { invitation: EncryptedInvitation; connectionInfo: ConnectionInfo };
+
+  /** Decrypt a received invitation using our Solana secret key. */
+  decryptInvitation(invitation: EncryptedInvitation): ConnectionInfo;
+
+  /** Serialize an invitation to a transport-safe string (base64). */
+  serializeInvitation(invitation: EncryptedInvitation): string;
+
+  /** Deserialize a transport string back into an EncryptedInvitation. */
+  deserializeInvitation(encoded: string): EncryptedInvitation;
+
+  /** Publish an encrypted invitation to the signaling channel. */
+  publishInvitation(
+    targetHandle: string,
+    invitation: EncryptedInvitation
+  ): Promise<string>;
+
+  /** Start listening for incoming invitations. */
+  startPolling(): void;
+
+  /** Stop listening for incoming invitations. */
+  stopPolling(): void;
+
+  /** Clean up resources. */
+  destroy(): void;
+
+  // EventEmitter-compatible event methods
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  on(event: string, listener: (...args: any[]) => void): this;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  emit(event: string, ...args: any[]): boolean;
+}
+
+/** Configuration base for any discovery provider. */
+export interface DiscoveryProviderConfig {
+  /** Polling interval in ms for invitation detection */
+  pollIntervalMs: number;
+}
+
 /** Encrypted invitation payload sent via Moltbook */
 export interface EncryptedInvitation {
   /** ECIES-encrypted payload containing multiaddr + session token */
