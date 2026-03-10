@@ -1,0 +1,21 @@
+{
+  "name": "@jetpayment/protocol-native",
+  "version": "0.1.0",
+  "description": "JetPayment native protocol: Moltbook discovery, libp2p P2P, FIPA ACL negotiation, Solana settlement",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "private": true,
+  "dependencies": {
+    "@jetpayment/core": "*",
+    "@chainsafe/libp2p-noise": "^16.1.0",
+    "@coral-xyz/anchor": "^0.30.1",
+    "@libp2p/interface": "^2.6.0",
+    "@libp2p/tcp": "^10.1.4",
+    "@libp2p/websockets": "^9.2.4",
+    "@solana/spl-token": "^0.4.12",
+    "@solana/web3.js": "^1.98.0",
+    "libp2p": "^2.8.2",
+    "uint8arrays": "^5.1.0",
+    "uuid": "^11.1.0"
+  }
+}

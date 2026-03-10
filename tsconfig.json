@@ -4,7 +4,7 @@
     "module": "commonjs",
     "lib": ["ES2022"],
     "outDir": "./dist",
-    "rootDir": "./src",
+    "rootDir": ".",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -13,8 +13,14 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "paths": {
+      "@jetpayment/core": ["./packages/core/src"],
+      "@jetpayment/core/*": ["./packages/core/src/*"],
+      "@jetpayment/protocol-native": ["./packages/protocol-native/src"],
+      "@jetpayment/protocol-native/*": ["./packages/protocol-native/src/*"]
+    }
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests", "contracts"]
+  "include": ["src/**/*", "packages/**/*", "agents/**/*", "tests/**/*"],
+  "exclude": ["node_modules", "dist"]
 }
